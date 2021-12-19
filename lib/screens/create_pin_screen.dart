@@ -1,10 +1,13 @@
+/* 1. This Create PIN page allows user to enter digits to create the pin
+   2. Has four indicators
+   3. Allows only four digits to be entered
+   4. upon entering the fourth digit, the user is navigated to Re-enter PIN page
+ */
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
-import 'package:rafia_cake_tech/bloc/passcode_bloc.dart';
-import 'package:rafia_cake_tech/models/user.dart';
-import 'package:rafia_cake_tech/screens/confirm_pin_screen.dart';
+import '../bloc/passcode_bloc.dart';
 import '../components/hold_pin.dart';
 import '../components/blank_space.dart';
 
@@ -37,29 +40,33 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
+        title: const Text(
           'Setup Pin',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[700],
+            color: Color(0xFf263238),
           ),
         ),
         centerTitle: true,
         actions: [
           Container(
+            width: 130,
             padding: const EdgeInsets.only(
               right: 20.0,
-              top: 14,
             ),
             margin: const EdgeInsets.only(
               left: 15,
             ),
-            child: Text(
-              'Use 4-digits PIN',
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(fontSize: 18.0),
-                  color: Colors.grey[400]),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                'Use 4-digits PIN',
+                style: GoogleFonts.poppins(
+                  textStyle: const TextStyle(fontSize: 24.0),
+                  color: const Color(0xFF90A4Ae),
+                ),
+              ),
             ),
           ),
         ],
@@ -77,6 +84,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
         },
         builder: (context, state) {
           return Container(
+            height: MediaQuery.of(context).size.height,
             color: Colors.white70,
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -85,7 +93,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                   text: text,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HoldCode(
                       height: height,
@@ -94,6 +102,9 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                       selectedIndex: selectedindex,
                       pincode: pin,
                     ),
+                    const SizedBox(
+                      width: 20,
+                    ),
                     HoldCode(
                       height: height,
                       width: width,
@@ -101,12 +112,18 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                       selectedIndex: selectedindex,
                       pincode: pin,
                     ),
+                    const SizedBox(
+                      width: 20,
+                    ),
                     HoldCode(
                       height: height,
                       width: width,
                       index: 3,
                       selectedIndex: selectedindex,
                       pincode: pin,
+                    ),
+                    const SizedBox(
+                      width: 20,
                     ),
                     HoldCode(
                       height: height,
@@ -118,7 +135,10 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
                   ],
                 ),
                 Container(
-                  margin: const EdgeInsets.all(12.0),
+                  margin: const EdgeInsets.only(
+                    top: 25,
+                    bottom: 2,
+                  ),
                   child: Column(
                     children: [
                       Row(
@@ -232,10 +252,10 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
         child: Center(
           child: Text(
             '$numKey',
-            style: TextStyle(
-              fontSize: 18,
+            style: const TextStyle(
+              fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[500],
+              color: Color(0xff123456),
             ),
           ),
         ),
@@ -264,10 +284,10 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
             ),
           ],
         ),
-        child: Center(
+        child: const Center(
             child: Icon(
           Icons.backspace,
-          color: Colors.grey[500],
+          color: Color(0xff123456),
           size: 18.0,
         )),
       ),
@@ -281,12 +301,9 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
         selectedindex = pin.length;
       });
     }
-    //navigate to error screen----test
+
     if (pin.length == 4) {
       context.read<PasscodeBloc>().passcodeScreenValidation(pin);
-      final newPin = User(pin);
-      //Adding to Hive
-      Hive.box('users').add(newPin);
     }
   }
 

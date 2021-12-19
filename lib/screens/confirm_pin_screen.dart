@@ -1,10 +1,19 @@
+/* 1. This Re-enter PIN page allows user to enter digits to create the pin
+   2. Has four indicators
+   3. Allows only four digits to be entered
+   4. upon entering the fourth digit, the user is navigated to Menu page
+   5. Uses BlocConsumer for Listening states and Building the required widget, CupertinoAlertDialog 
+   6. Bloc method is invoked to store data in Hive db
+   7. CupertinoAlertDialog shows either Success message or Error message
+   8. Error message is shown when Re-entered PIN doesn't match with the Created PIN
+ */
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
 
-import 'package:rafia_cake_tech/bloc/passcode_bloc.dart';
+import '../bloc/passcode_bloc.dart';
 
 import '../components/blank_space.dart';
 import '../components/create_pin_prompt.dart';
@@ -41,29 +50,33 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
+        title: const Text(
           'Setup Pin',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[700],
+            color: Color(0xFf263238),
           ),
         ),
         centerTitle: true,
         actions: [
           Container(
+            width: 130,
             padding: const EdgeInsets.only(
               right: 20.0,
-              top: 14,
             ),
             margin: const EdgeInsets.only(
               left: 15,
             ),
-            child: Text(
-              'Use 4-digits PIN',
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(fontSize: 18.0),
-                  color: Colors.grey[400]),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                'Use 4-digits PIN',
+                style: GoogleFonts.poppins(
+                  textStyle: const TextStyle(fontSize: 24.0),
+                  color: const Color(0xFF90A4Ae),
+                ),
+              ),
             ),
           ),
         ],
@@ -89,6 +102,7 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
         },
         builder: (context, state) {
           return Container(
+            height: MediaQuery.of(context).size.height,
             color: Colors.white70,
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -97,7 +111,7 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
                   text: text,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HoldCode(
                       height: height,
@@ -106,6 +120,9 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
                       selectedIndex: selectedindex,
                       pincode: pin,
                     ),
+                    const SizedBox(
+                      width: 20,
+                    ),
                     HoldCode(
                       height: height,
                       width: width,
@@ -113,12 +130,18 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
                       selectedIndex: selectedindex,
                       pincode: pin,
                     ),
+                    const SizedBox(
+                      width: 20,
+                    ),
                     HoldCode(
                       height: height,
                       width: width,
                       index: 3,
                       selectedIndex: selectedindex,
                       pincode: pin,
+                    ),
+                    const SizedBox(
+                      width: 20,
                     ),
                     HoldCode(
                       height: height,
@@ -130,7 +153,10 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
                   ],
                 ),
                 Container(
-                  margin: const EdgeInsets.all(12.0),
+                  margin: const EdgeInsets.only(
+                    top: 25,
+                    bottom: 2,
+                  ),
                   child: Column(
                     children: [
                       Row(
@@ -220,7 +246,7 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
     );
   }
 
-//**************************************METHODS**************************************************//
+  /// ************************************METHODS**************************************************/
   TextButton numericKey(double height, double width, int numKey) {
     return TextButton(
       onPressed: () {
@@ -244,10 +270,10 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
         child: Center(
           child: Text(
             '$numKey',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[500],
+              color: Color(0xff123456),
             ),
           ),
         ),
@@ -276,10 +302,10 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
             ),
           ],
         ),
-        child: Center(
+        child: const Center(
             child: Icon(
           Icons.backspace,
-          color: Colors.grey[500],
+          color: Color(0xff123456),
           size: 18.0,
         )),
       ),
@@ -293,7 +319,7 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
         selectedindex = pin.length;
       });
     }
-    //navigate to error screen----test
+
     if (pin.length == 4) {
       context
           .read<PasscodeBloc>()
@@ -324,8 +350,7 @@ class _ConfirmPinScreenState extends State<ConfirmPinScreen> {
             style: Theme.of(context).textTheme.bodyText2,
           ),
           onPressed: () {
-            Navigator.of(context).pushNamed('/authenticate-passcode',
-                arguments: widget.passcode);
+            Navigator.of(context).pushNamed('/');
           },
         ),
       ],

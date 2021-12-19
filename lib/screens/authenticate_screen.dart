@@ -1,3 +1,13 @@
+/* 1. This Enter PIN page allows user to enter digits to create the pin
+   2. Has four indicators
+   3. Allows only four digits to be entered
+   4. upon entering the fourth digit, the user is shown a CupertinoAlertDialog 
+   5. Uses BlocConsumer for Listening states and Building the required widget, CupertinoAlertDialog 
+   6. Bloc methods are invoked for getting Hive db data for matching Entered PIN
+   7. CupertinoAlertDialog shows either Success message or Error message
+   8. Error message is shown when Entered PIN doesn't match with the PIN stored in Hive db
+ */
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,11 +20,7 @@ import '../components/create_pin_prompt.dart';
 import '../components/hold_pin.dart';
 
 class AuthenticateScreen extends StatefulWidget {
-  const AuthenticateScreen({
-    Key? key,
-    required this.passcodeDb,
-  }) : super(key: key);
-  final String passcodeDb;
+  const AuthenticateScreen({Key? key}) : super(key: key);
 
   @override
   _AuthenticateScreenState createState() => _AuthenticateScreenState();
@@ -24,6 +30,24 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
   var pin = '';
   var selectedindex = 0;
   var text = 'Enter Your PIN';
+  late String? storedPasscode = '';
+
+  // make a initial state
+  @override
+  void initState() {
+    // call the getPasscode function to storedPasscode variable
+    getPasscode();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future getPasscode() async {
+    storedPasscode = await context.read<PasscodeBloc>().getPincodeFromHive();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,29 +64,33 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
+        title: const Text(
           'Setup Pin',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.grey[700],
+            color: Color(0xFf263238),
           ),
         ),
         centerTitle: true,
         actions: [
           Container(
+            width: 130,
             padding: const EdgeInsets.only(
-              right: 20.0,
-              top: 14,
+              right: 12.0,
             ),
             margin: const EdgeInsets.only(
-              left: 15,
+              left: 13,
             ),
-            child: Text(
-              'Use 4-digits PIN',
-              style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(fontSize: 18.0),
-                  color: Colors.grey[400]),
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                'Use 4-digits PIN',
+                style: GoogleFonts.poppins(
+                  textStyle: const TextStyle(fontSize: 24.0),
+                  color: const Color(0xFF90A4Ae),
+                ),
+              ),
             ),
           ),
         ],
@@ -85,9 +113,17 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
               builder: errorDialog,
             );
           }
+          if (state.status == PasscodeStatus.passcodeNotSet) {
+            // pop the current screen
+            showCupertinoDialog(
+              context: context,
+              builder: noPasswordCreated,
+            );
+          }
         },
         builder: (context, state) {
           return Container(
+            height: MediaQuery.of(context).size.height,
             color: Colors.white70,
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -96,7 +132,7 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                   text: text,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     HoldCode(
                       height: height,
@@ -105,6 +141,9 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                       selectedIndex: selectedindex,
                       pincode: pin,
                     ),
+                    const SizedBox(
+                      width: 20,
+                    ),
                     HoldCode(
                       height: height,
                       width: width,
@@ -112,12 +151,18 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                       selectedIndex: selectedindex,
                       pincode: pin,
                     ),
+                    const SizedBox(
+                      width: 20,
+                    ),
                     HoldCode(
                       height: height,
                       width: width,
                       index: 3,
                       selectedIndex: selectedindex,
                       pincode: pin,
+                    ),
+                    const SizedBox(
+                      width: 20,
                     ),
                     HoldCode(
                       height: height,
@@ -129,7 +174,10 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
                   ],
                 ),
                 Container(
-                  margin: const EdgeInsets.all(12.0),
+                  margin: const EdgeInsets.only(
+                    top: 25,
+                    bottom: 2,
+                  ),
                   child: Column(
                     children: [
                       Row(
@@ -243,10 +291,10 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
         child: Center(
           child: Text(
             '$numKey',
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.grey[500],
+              color: Color(0xff123456),
             ),
           ),
         ),
@@ -275,10 +323,10 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
             ),
           ],
         ),
-        child: Center(
+        child: const Center(
             child: Icon(
           Icons.backspace,
-          color: Colors.grey[500],
+          color: Color(0xff123456),
           size: 18.0,
         )),
       ),
@@ -292,9 +340,9 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
         selectedindex = pin.length;
       });
     }
-    //navigate to error screen----test
+
     if (pin.length == 4) {
-      context.read<PasscodeBloc>().authenticatePasscode(widget.passcodeDb, pin);
+      context.read<PasscodeBloc>().authenticatePasscode(storedPasscode, pin);
     }
   }
 
@@ -348,6 +396,26 @@ class _AuthenticateScreenState extends State<AuthenticateScreen> {
           ),
           onPressed: () {
             Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget noPasswordCreated(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: Text(
+        'Please Create a passcode',
+        style: Theme.of(context).textTheme.headline6,
+      ),
+      actions: [
+        CupertinoDialogAction(
+          child: Text(
+            'OK',
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+          onPressed: () {
+            Navigator.of(context).pushNamed('/');
           },
         ),
       ],

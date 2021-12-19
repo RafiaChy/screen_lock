@@ -1,3 +1,9 @@
+// ignore: slash_for_doc_comments
+/**
+ * The sates:
+  check out the enum
+ */
+
 part of 'passcode_bloc.dart';
 
 class PasscodeState with EquatableMixin {
@@ -47,4 +53,5 @@ enum PasscodeStatus {
   passcodeFailure,
   passcodeSuccessConfirm,
   passcodeFailConfirm,
+  passcodeNotSet,
 }

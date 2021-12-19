@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
 import 'package:rafia_cake_tech/generated_route.dart';
 import 'package:rafia_cake_tech/models/user.dart';
-import 'package:path_provider/path_provider.dart' as path_provider;
 
 Future main() async {
   //Adding Hive
   WidgetsFlutterBinding.ensureInitialized();
-
-  // final appDocumentDirectory =
-  //     await path_provider.getApplicationDocumentsDirectory();
-  // Hive.init(appDocumentDirectory.path);
-
-  // Hive.registerAdapter(UserAdapter());
   await Hive.initFlutter();
+  Hive.registerAdapter(UserAdapter());
+  await Hive.openBox<User>('user');
+
   runApp(const MyApp());
 }
 
@@ -35,4 +30,5 @@ class MyApp extends StatelessWidget {
         onGenerateRoute: RouteGenerator.generateRoute,
       );
 }
-//opened hive at generator class
+
+// all the navigation work is handled inside: generated_route.dart file

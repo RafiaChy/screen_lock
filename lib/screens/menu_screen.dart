@@ -1,9 +1,12 @@
+//Menu page that either navigates to Create PIN Page or Authenticate Page
+
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:rafia_cake_tech/bloc/passcode_bloc.dart';
 import '../components/custom_menu_button.dart';
 
 class MenuScreen extends StatelessWidget {
+  const MenuScreen({Key? key}) : super(key: key);
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +39,9 @@ class MenuScreen extends StatelessWidget {
               ),
               const Spacer(),
               CustomMenuButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).pushNamed('/authenticate-passcode');
+                },
                 text: 'Authenticate',
               ),
             ],
@@ -46,3 +51,7 @@ class MenuScreen extends StatelessWidget {
     );
   }
 }
+
+/**
+ * flutter build apk --build-name=1.0.3 --build-number=3
+ */

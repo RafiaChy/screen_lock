@@ -1,6 +1,8 @@
+//1. Handles all the navigation routes and related arguments here
+//2. uses BlocProvider
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:rafia_cake_tech/screens/authenticate_screen.dart';
 import 'package:rafia_cake_tech/screens/confirm_pin_screen.dart';
 import '../screens/create_pin_screen.dart';
@@ -13,28 +15,13 @@ class RouteGenerator {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (_) => MenuScreen(),
+          builder: (_) => const MenuScreen(),
         );
       case '/create-pin-screen':
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (context) => PasscodeBloc(),
-
-            //Hive opened with FutureBuilder. B
-            child: FutureBuilder(
-              future: Hive.openBox('users'),
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  if (snapshot.hasError) {
-                    return Text(snapshot.error.toString());
-                  } else {
-                    return const CreatePinScreen();
-                  }
-                } else {
-                  return const Scaffold();
-                }
-              },
-            ),
+            child: const CreatePinScreen(),
           ),
         );
 
@@ -53,15 +40,11 @@ class RouteGenerator {
         break;
 
       case '/authenticate-passcode':
-        if (args is String) {
-          return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                create: (context) => PasscodeBloc(),
-                child: AuthenticateScreen(
-                  passcodeDb: args,
-                )),
-          );
-        }
+        return MaterialPageRoute(
+          builder: (_) => BlocProvider(
+              create: (context) => PasscodeBloc(),
+              child: const AuthenticateScreen()),
+        );
     }
     return _errorRoute();
   }

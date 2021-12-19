@@ -1,3 +1,5 @@
+//The widget for indicator
+
 import 'package:flutter/material.dart';
 
 class HoldCode extends StatelessWidget {
@@ -25,12 +27,14 @@ class HoldCode extends StatelessWidget {
         height: height * 0.5,
         width: width * 0.5,
         decoration: BoxDecoration(
-          color: index == selectedIndex ? Colors.purple.shade600 : Colors.grey,
+          color: index == selectedIndex
+              ? Colors.purple.shade600
+              : Colors.grey[300],
           shape: BoxShape.circle,
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Colors.purple.shade700,
-              offset: const Offset(0, 0),
+              color: Colors.white70,
+              offset: Offset(0, 0),
               spreadRadius: 1.5,
               blurRadius: 2,
             ),
@@ -56,10 +60,10 @@ class HoldCode extends StatelessWidget {
             : Container(
                 height: height * 0.5,
                 width: width * 0.5,
-                decoration: const BoxDecoration(
-                  color: Colors.grey,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
                   shape: BoxShape.circle,
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.white54,
                       offset: Offset(0, 0),
