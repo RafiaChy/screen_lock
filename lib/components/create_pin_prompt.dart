@@ -4,7 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 class CreatePinPrompt extends StatelessWidget {
   const CreatePinPrompt({
     Key? key,
+    required this.text,
   }) : super(key: key);
+  final String text;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,7 @@ class CreatePinPrompt extends StatelessWidget {
         15.0,
       ),
       child: Text(
-        'Create PIN',
+        text,
         style: GoogleFonts.poppins(
             textStyle: Theme.of(context).textTheme.headline4,
             color: Colors.grey[500]),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:rafia_cake_tech/bloc/passcode_bloc.dart';
 import '../components/custom_menu_button.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -30,12 +32,12 @@ class MenuScreen extends StatelessWidget {
                 onPressed: () {
                   Navigator.of(context).pushNamed('/create-pin-screen');
                 },
-                text: 'Create New Pin',
+                text: 'Create Pin',
               ),
               const Spacer(),
               CustomMenuButton(
                 onPressed: () {},
-                text: 'Authenticate Pin',
+                text: 'Authenticate',
               ),
             ],
           ),

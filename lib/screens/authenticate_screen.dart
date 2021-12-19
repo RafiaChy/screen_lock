@@ -1,26 +1,29 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hive/hive.dart';
+
 import 'package:rafia_cake_tech/bloc/passcode_bloc.dart';
-import 'package:rafia_cake_tech/models/user.dart';
-import 'package:rafia_cake_tech/screens/confirm_pin_screen.dart';
-import '../components/hold_pin.dart';
+
 import '../components/blank_space.dart';
-
 import '../components/create_pin_prompt.dart';
+import '../components/hold_pin.dart';
 
-class CreatePinScreen extends StatefulWidget {
-  const CreatePinScreen({Key? key}) : super(key: key);
+class AuthenticateScreen extends StatefulWidget {
+  const AuthenticateScreen({
+    Key? key,
+    required this.passcodeDb,
+  }) : super(key: key);
+  final String passcodeDb;
 
   @override
-  _CreatePinScreenState createState() => _CreatePinScreenState();
+  _AuthenticateScreenState createState() => _AuthenticateScreenState();
 }
 
-class _CreatePinScreenState extends State<CreatePinScreen> {
+class _AuthenticateScreenState extends State<AuthenticateScreen> {
   var pin = '';
   var selectedindex = 0;
-  var text = 'Create PIN';
+  var text = 'Enter Your PIN';
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +73,17 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
       ),
       body: BlocConsumer<PasscodeBloc, PasscodeState>(
         listener: (context, state) {
-          if (state.status == PasscodeStatus.passcodeScreenDone) {
-            Navigator.of(context)
-                .pushNamed('/confirm-pin-screen', arguments: pin);
+          if (state.status == PasscodeStatus.passcodeMatch) {
+            showCupertinoDialog(
+              context: context,
+              builder: confimPinDialog,
+            );
+          }
+          if (state.status == PasscodeStatus.passcodeMismatch) {
+            showCupertinoDialog(
+              context: context,
+              builder: errorDialog,
+            );
           }
         },
         builder: (context, state) {
@@ -283,10 +294,7 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
     }
     //navigate to error screen----test
     if (pin.length == 4) {
-      context.read<PasscodeBloc>().passcodeScreenValidation(pin);
-      final newPin = User(pin);
-      //Adding to Hive
-      Hive.box('users').add(newPin);
+      context.read<PasscodeBloc>().authenticatePasscode(widget.passcodeDb, pin);
     }
   }
 
@@ -298,5 +306,51 @@ class _CreatePinScreenState extends State<CreatePinScreen> {
       pin = pin.substring(0, pin.length - 1);
       selectedindex = pin.length;
     });
+  }
+
+  Widget confimPinDialog(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: Text(
+        'Authentication success',
+        style: Theme.of(context).textTheme.headline6,
+      ),
+      actions: [
+        CupertinoDialogAction(
+          child: Text(
+            'OK',
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+          onPressed: () {
+            Navigator.of(context).pushNamed('/');
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget errorDialog(BuildContext context) {
+    return CupertinoAlertDialog(
+      title: Text(
+        'Error',
+        style: Theme.of(context).textTheme.headline6,
+      ),
+      content: Text(
+        'Passcode did not match',
+        style: Theme.of(context).textTheme.bodyText2?.copyWith(
+              color: Colors.red,
+            ),
+      ),
+      actions: [
+        CupertinoDialogAction(
+          child: Text(
+            'OK',
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
   }
 }
